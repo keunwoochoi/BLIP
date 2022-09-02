@@ -33,10 +33,10 @@ class BLIP_VQA(nn.Module):
         decoder_config = BertConfig.from_json_file(med_config)        
         self.text_decoder = BertLMHeadModel(config=decoder_config)          
 
-
-    def forward(self, image, question, answer=None, n=None, weights=None, train=True, inference='rank', k_test=128):
-        
-        image_embeds = self.visual_encoder(image) 
+    def forward(self, image, question, image_embeds=None, answer=None, n=None, weights=None, train=True, inference='rank', k_test=128):
+        if image_embeds is None:
+            image_embeds = self.visual_encoder(image)
+            
         image_atts = torch.ones(image_embeds.size()[:-1],dtype=torch.long).to(image.device)
         
         question = self.tokenizer(question, padding='longest', truncation=True, max_length=35, 
